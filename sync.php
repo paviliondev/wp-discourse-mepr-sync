@@ -12,9 +12,9 @@
 
 
 use WPDiscourse\Utilities\Utilities as Utilities;
-define('PV_MEMBERPRESS_PRODUCT_IDS', array(153));
-define('PV_DISCOURSE_ENROLLED_GROUP', 'locker');
-define('PV_DISCOURSE_UNENROLLED_GROUP', 'nolocker');
+define('PV_MEMBERPRESS_PRODUCT_IDS', array(12, 47));
+define('PV_DISCOURSE_ENROLLED_GROUP', 'Students');
+define('PV_DISCOURSE_UNENROLLED_GROUP', 'KaizenAlumni');
 
 add_action("mepr_subscription_transition_status", function ($old, $new, $subscription) {
 	if(!in_array($subscription->product_id, PV_MEMBERPRESS_PRODUCT_IDS)) return;
