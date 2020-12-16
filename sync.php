@@ -15,12 +15,12 @@ use WPDiscourse\Utilities\Utilities as Utilities;
 define('PV_MEMBERPRESS_PRODUCT_IDS', array(12, 47));
 define('PV_DISCOURSE_ENROLLED_GROUP', 'Students');
 define('PV_DISCOURSE_UNENROLLED_GROUP', 'KaizenAlumni');
-define('PV_MEPR_ACTIVE_STATUSES', array('active', 'cancelled'));
+define('PV_MEPR_ACTIVE_STATUSES', array('active'));
 
-add_action("mepr_subscription_transition_status", function ($old, $new, $subscription) {
-	if(!in_array($subscription->product_id, PV_MEMBERPRESS_PRODUCT_IDS)) return;
+add_action("mepr-txn-transition-status", function ($old, $new, $transaction) {
+	if(!in_array($transaction->product_id, PV_MEMBERPRESS_PRODUCT_IDS)) return;
 
-	if(in_array($new, PV_MEPR_ACTIVE_STATUSES)) {
+	if(in_array($new, PV_MEPR_ACTIVE_STATUSES) && !$transaction->is_expired()) {
 		pv_enroll_to_group($subscription);
 	} else {
 		pv_remove_from_group($subscription);
