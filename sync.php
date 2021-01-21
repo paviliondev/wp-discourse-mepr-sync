@@ -12,20 +12,33 @@
 
 
 use WPDiscourse\Utilities\Utilities as Utilities;
-define('PV_MEMBERPRESS_PRODUCT_IDS', array(12, 47));
-define('PV_DISCOURSE_ENROLLED_GROUP', 'Students');
+define('PV_MEMBERPRESS_PRODUCT_IDS', array(153, 161));
+define('PV_DISCOURSE_ENROLLED_GROUP', 'locker');
 define('PV_DISCOURSE_UNENROLLED_GROUP', 'KaizenAlumni');
 define('PV_MEPR_ACTIVE_STATUSES', array('complete'));
+$statuses= [
+	"complete",
+	"pending",
+	"failed",
+	"confirmed",
+	"refunded",
+];
 
-add_action("mepr-txn-transition-status", function ($old, $new, $transaction) {
+foreach($statuses as $status) {
+	add_action("mepr-txn-status-".$status, function($transaction) {
+		pv_update_membership($transaction);
+	});
+}
+function pv_update_membership($transaction) {
 	if(!in_array($transaction->product_id, PV_MEMBERPRESS_PRODUCT_IDS)) return;
-
-	if(in_array($new, PV_MEPR_ACTIVE_STATUSES) && !$transaction->is_expired()) {
+	$user = get_userdata($transaction->user_id);
+	error_log(print_r($user->roles, true));
+	if(in_array('mepr-active', $user->roles)) {
 		pv_enroll_to_group($transaction);
 	} else {
 		pv_remove_from_group($transaction);
 	}
-}, 10, 3);
+}
 
 function pv_enroll_to_group($transaction) {
 	Utilities::add_user_to_discourse_group($transaction->user_id, PV_DISCOURSE_ENROLLED_GROUP);
